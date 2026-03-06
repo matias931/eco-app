@@ -389,7 +389,7 @@
   <div class="container">
     <div class="counter-wrap">
       <span style="font-size:1.4rem">🥚</span>
-      <p class="counter-text"><span id="ecoCount">2.500</span> Ecos esperando despertar</p>
+      <p class="counter-text"><span id="ecoCount">1.024</span> Ecos esperando despertar</p>
     </div>
   </div>
 </section>
@@ -713,11 +713,17 @@
 <script>
 // ── Counter ─────────────────────────────────────────
 (function(){
-  var el=document.getElementById('ecoCount'), start=2500, end=2847, dur=2800, t0=null;
-  function ease(t){return 1-Math.pow(1-t,3);}
-  function fmt(n){return Math.floor(n).toLocaleString('es-AR');}
-  function run(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/dur,1);el.textContent=fmt(start+(end-start)*ease(p));if(p<1)requestAnimationFrame(run);}
-  var obs=new IntersectionObserver(function(e){if(e[0].isIntersecting){requestAnimationFrame(run);obs.disconnect();}},{threshold:.5});
+  var el=document.getElementById('ecoCount');
+  var count=1024, interval=null, started=false;
+  function fmt(n){return n.toLocaleString('es-AR');}
+  function tick(){if(count>1){count--;el.textContent=fmt(count);}}
+  var obs=new IntersectionObserver(function(e){
+    if(e[0].isIntersecting){
+      if(!started){started=true;interval=setInterval(tick,3200);}
+    } else {
+      if(interval){clearInterval(interval);interval=null;started=false;}
+    }
+  },{threshold:.5});
   obs.observe(document.getElementById('social-proof'));
 })();
 
