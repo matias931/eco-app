@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ECO — Despertá tu criatura</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:     #080705;
+      --bg2:    #0F0B07;
+      --bg3:    #111009;
+      --cream:  #F0E6D0;
+      --c60:    rgba(240,230,208,0.6);
+      --c30:    rgba(240,230,208,0.3);
+      --c15:    rgba(240,230,208,0.15);
+      --orange: #F5A623;
+      --or20:   rgba(245,166,35,0.20);
+      --or10:   rgba(245,166,35,0.10);
+      --r:      20px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg); color: var(--cream);
+      font-family: 'Inter', sans-serif; font-weight: 400;
+      line-height: 1.6; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .4;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    }
+
+    h1,h2,h3 { font-family:'Playfair Display',serif; line-height:1.15; }
+    h1 { font-size:clamp(2.8rem,7vw,5.5rem); font-weight:700; }
+    h2 { font-size:clamp(1.9rem,4.5vw,3rem); font-weight:700; }
+    h3 { font-size:1.1rem; font-weight:700; }
+    a  { color:inherit; text-decoration:none; }
+
+    .container { max-width:1180px; margin:0 auto; padding:0 24px; }
+    section { position:relative; z-index:1; }
+
+    /* ── BUTTON ── */
+    .btn {
+      display:inline-flex; align-items:center; gap:8px;
+      background:var(--orange); color:#080705;
+      font-family:'Inter',sans-serif; font-weight:600; font-size:1rem;
+      padding:14px 32px; border-radius:100px; border:none; cursor:pointer;
+      transition:transform .2s, box-shadow .2s;
+      box-shadow:0 0 24px rgba(245,166,35,.35);
+    }
+    .btn:hover { transform:translateY(-2px); box-shadow:0 0 40px rgba(245,166,35,.55); }
+    .btn-lg { font-size:1.15rem; padding:18px 44px; }
+
+    /* KEYFRAMES */
+    @keyframes floatY    { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-16px)} }
+    @keyframes pulseGlow { 0%,100%{opacity:.6;transform:scale(1)} 50%{opacity:1;transform:scale(1.08)} }
+    @keyframes pFloat    { 0%{opacity:0;transform:translateY(0)scale(1)} 35%{opacity:.45} 70%{opacity:.28;transform:translateY(-22px)scale(.8)} 100%{opacity:0;transform:translateY(-38px)scale(.5)} }
+    @keyframes fadeUp    { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes shake     { 0%,100%{transform:translateX(0)rotate(0)} 15%{transform:translateX(-8px)rotate(-3deg)} 30%{transform:translateX(8px)rotate(3deg)} 45%{transform:translateX(-6px)rotate(-2deg)} 60%{transform:translateX(6px)rotate(2deg)} 75%{transform:translateX(-4px)rotate(-1deg)} 90%{transform:translateX(4px)rotate(1deg)} }
+    @keyframes msgIn     { from{opacity:0;transform:translateY(10px)scale(.97)} to{opacity:1;transform:translateY(0)scale(1)} }
+    @keyframes typeDot   { 0%,80%,100%{transform:scale(.6);opacity:.4} 40%{transform:scale(1);opacity:1} }
+    @keyframes xpPop     { 0%{opacity:0;transform:translateY(6px)scale(.9)} 20%{opacity:1;transform:translateY(0)scale(1)} 80%{opacity:1} 100%{opacity:0;transform:translateY(-12px)} }
+    .egg-shaking { animation: shake .65s ease !important; }
+
+    /* ════════════════════════
+       1. HERO
+    ════════════════════════ */
+    #hero { min-height:100vh; display:flex; align-items:center; padding:80px 0; }
+    .hero-grid { display:grid; grid-template-columns:1fr 1fr; gap:64px; align-items:center; }
+    .hero-left { display:flex; flex-direction:column; gap:28px; }
+
+    .badge {
+      display:inline-flex; align-items:center; gap:8px;
+      background:rgba(245,166,35,.10); border:1px solid rgba(245,166,35,.28);
+      color:var(--orange); font-size:.78rem; font-weight:500;
+      padding:7px 16px 6px; border-radius:100px; letter-spacing:.07em;
+      width:fit-content; line-height:1;
+    }
+    .badge-dot { width:8px; height:8px; background:var(--orange); border-radius:50%; flex-shrink:0; box-shadow:0 0 6px var(--orange); }
+
+    .hero-title { line-height:1.1; letter-spacing:-.02em; }
+    .hero-title .accent { color:var(--orange); }
+    .hero-sub { font-size:1.1rem; color:var(--c60); line-height:1.7; max-width:420px; }
+    .hero-cta { display:flex; flex-direction:column; gap:10px; align-items:flex-start; }
+    .micro { font-size:.78rem; color:var(--c30); letter-spacing:.04em; }
+
+    .hero-right { display:flex; justify-content:center; align-items:center; }
+    .egg-wrap { position:relative; width:clamp(240px,28vw,360px); aspect-ratio:352/434; }
+    .egg-glow { position:absolute; inset:-50px; background:radial-gradient(ellipse at center,rgba(245,166,35,.2) 0%,transparent 68%); border-radius:50%; animation:pulseGlow 3s ease-in-out infinite; }
+    .egg-img { width:100%; height:100%; object-fit:contain; position:relative; z-index:1; animation:floatY 3.5s ease-in-out infinite; filter:drop-shadow(0 0 28px rgba(245,166,35,.5)); }
+    .particle { position:absolute; border-radius:50%; background:var(--orange); opacity:0; animation:pFloat 4s ease-in-out infinite; }
+    .p1{width:6px;height:6px;top:18%;left:4%;animation-delay:0s}
+    .p2{width:4px;height:4px;top:63%;right:7%;animation-delay:1.2s}
+    .p3{width:5px;height:5px;top:78%;left:18%;animation-delay:2.1s}
+    .p4{width:3px;height:3px;top:12%;right:14%;animation-delay:.7s}
+
+    /* ════════════════════════
+       2. SOCIAL PROOF
+    ════════════════════════ */
+    #social-proof { background:var(--bg3); border-top:1px solid var(--c15); border-bottom:1px solid var(--c15); padding:28px 0; text-align:center; }
+    .counter-wrap { display:inline-flex; align-items:center; gap:10px; }
+    .counter-text { font-size:clamp(1rem,2.8vw,1.4rem); font-weight:500; letter-spacing:.02em; }
+    #ecoCount { color:var(--orange); font-weight:600; font-variant-numeric:tabular-nums; }
+
+    /* ════════════════════════
+       DIVIDER
+    ════════════════════════ */
+    .divider { display:flex; justify-content:center; padding:40px 24px; opacity:.2; }
+    .divider svg { width:100%; max-width:560px; }
+
+    /* ════════════════════════
+       3. CÓMO FUNCIONA
+    ════════════════════════ */
+    #como { padding:88px 0 72px; }
+    .sec-title { text-align:center; margin-bottom:56px; }
+
+    .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+    .step-card { padding:32px 24px; border-radius:var(--r); background:rgba(240,230,208,.03); border:1px solid var(--c15); display:flex; flex-direction:column; gap:14px; transition:border-color .3s,transform .3s; }
+    .step-card:hover { border-color:var(--or20); transform:translateY(-4px); }
+    .step-num { font-family:'Playfair Display',serif; font-size:3.2rem; font-weight:700; color:rgba(245,166,35,.2); line-height:1; }
+    .step-icon { width:34px; height:34px; }
+    .step-card h3 { font-size:1.2rem; }
+    .step-card p { color:var(--c60); font-size:.93rem; line-height:1.65; }
+
+    /* ════════════════════════
+       4. DEMO — PHONE MOCK
+    ════════════════════════ */
+    #demo { padding:96px 0; background:var(--bg2); position:relative; overflow:hidden; }
+    #demo::before { content:''; position:absolute; top:-120px; right:-120px; width:480px; height:480px; border-radius:50%; background:radial-gradient(circle,rgba(245,166,35,.07) 0%,transparent 65%); pointer-events:none; }
+
+    .demo-grid { display:grid; grid-template-columns:1fr 1fr; gap:72px; align-items:center; }
+
+    /* Left copy */
+    .demo-left { display:flex; flex-direction:column; gap:28px; }
+    .demo-left h2 { line-height:1.2; }
+    .demo-left p { color:var(--c60); font-size:1rem; line-height:1.75; max-width:400px; }
+    .demo-features { display:flex; flex-direction:column; gap:14px; margin-top:4px; }
+    .demo-feat { display:flex; align-items:flex-start; gap:14px; }
+    .feat-icon { width:40px; height:40px; border-radius:12px; background:rgba(245,166,35,.1); border:1px solid rgba(245,166,35,.2); display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+    .feat-text strong { display:block; font-size:.92rem; font-weight:600; margin-bottom:2px; }
+    .feat-text span { font-size:.82rem; color:var(--c60); }
+
+    /* ── Phone frame ── */
+    .phone-wrap { display:flex; justify-content:center; align-items:center; }
+    .phone {
+      width:210px; border-radius:40px;
+      border:7px solid #1C1710;
+      outline:1.5px solid #2E2418;
+      box-shadow: 0 32px 80px rgba(0,0,0,.75), 0 0 0 1px rgba(255,255,255,.04) inset, 0 1px 0 rgba(255,255,255,.08) inset;
+      background:#0D0A07; overflow:hidden;
+      transform:perspective(900px) rotateY(-5deg) rotateX(2deg);
+      transition:transform .4s ease;
+    }
+    .phone:hover { transform:perspective(900px) rotateY(-1deg) rotateX(.5deg); }
+
+    /* Dynamic island */
+    .island { width:84px; height:22px; background:#000; border-radius:14px; margin:8px auto 0; }
+
+    /* Status bar */
+    .status-bar { display:flex; justify-content:space-between; align-items:center; padding:4px 16px 3px; font-size:.55rem; color:rgba(240,230,208,.5); font-weight:500; }
+
+    /* Chat header */
+    .chat-head { background:#1A140D; padding:8px 12px; display:flex; align-items:center; gap:8px; border-bottom:1px solid rgba(255,255,255,.05); }
+    .eco-avatar { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#F5A623,#C06A00); display:flex; align-items:center; justify-content:center; font-size:.85rem; flex-shrink:0; overflow:hidden; }
+    .eco-avatar img { width:100%; height:100%; object-fit:cover; }
+    .chat-head-info { flex:1; }
+    .chat-head-name { font-size:.72rem; font-weight:600; color:var(--cream); }
+    .chat-head-status { font-size:.58rem; color:var(--orange); }
+    .chat-head-dots { display:flex; gap:3px; }
+    .chat-head-dots span { width:3px; height:3px; border-radius:50%; background:var(--c30); }
+
+    /* Chat body */
+    .chat-body { background:#0D0A07; padding:10px 8px; display:flex; flex-direction:column; gap:5px; min-height:290px; overflow-y:hidden; }
+
+    /* All messages start hidden, animate in via JS-added .playing class */
+    .cmsg { opacity:0; }
+    .chat-wrap.playing .cmsg { animation:msgIn .35s ease forwards; }
+    .chat-wrap.playing .cm1  { animation-delay:.4s; }
+    .chat-wrap.playing .cm2  { animation-delay:1.1s; }
+    .chat-wrap.playing .cm3  { animation-delay:2.0s; }
+    .chat-wrap.playing .cm4  { animation-delay:2.9s; }
+    .chat-wrap.playing .cm5  { animation-delay:3.7s; }
+    .chat-wrap.playing .cm6  { animation-delay:4.5s; }
+    .chat-wrap.playing .cm7  { animation-delay:4.72s; }
+    .chat-wrap.playing .cm8  { animation-delay:4.94s; }
+    .chat-wrap.playing .cm9  { animation-delay:5.16s; }
+    .chat-wrap.playing .cm10 { animation-delay:5.38s; }
+    .chat-wrap.playing .cm11 { animation-delay:5.60s; }
+    .chat-wrap.playing .cm12 { animation-delay:6.3s; }
+    .chat-wrap.playing .cm13 { animation-delay:7.0s; }
+
+    /* Typing indicator */
+    .typing-indicator { display:flex; align-items:center; gap:4px; padding:8px 12px; background:#1A140D; border-radius:16px 16px 16px 4px; width:fit-content; }
+    .td { width:5px; height:5px; border-radius:50%; background:var(--c30); animation:typeDot 1.2s ease-in-out infinite; }
+    .td:nth-child(2){animation-delay:.2s}
+    .td:nth-child(3){animation-delay:.4s}
+
+    /* System notification */
+    .sys-notif { background:rgba(245,166,35,.12); border:1px solid rgba(245,166,35,.25); border-radius:10px; padding:7px 10px; margin:4px 0; display:flex; align-items:center; gap:7px; }
+    .sys-notif span { font-size:.67rem; color:var(--orange); font-weight:500; }
+
+    /* ECO message (left) */
+    .eco-row { display:flex; gap:5px; align-items:flex-end; }
+    .eco-av-sm { width:18px; height:18px; border-radius:50%; background:linear-gradient(135deg,#F5A623,#C06A00); display:flex; align-items:center; justify-content:center; font-size:.6rem; flex-shrink:0; overflow:hidden; }
+    .eco-av-sm img { width:100%; height:100%; object-fit:cover; }
+    .eco-bubble { background:#1F180F; border-radius:13px 13px 13px 3px; padding:6px 10px; max-width:138px; font-size:.66rem; line-height:1.45; color:var(--cream); }
+
+    /* User message (right) */
+    .user-row { display:flex; justify-content:flex-end; }
+    .user-bubble { background:#2A5C45; border-radius:13px 13px 3px 13px; padding:6px 10px; max-width:138px; font-size:.66rem; line-height:1.45; color:#fff; }
+
+    /* Stickers */
+    .sticker-row { display:flex; justify-content:flex-end; }
+    .sticker { font-size:1.3rem; background:rgba(42,92,69,.25); border:1px solid rgba(42,92,69,.4); border-radius:8px; padding:3px 5px; line-height:1; }
+
+    /* XP popup */
+    .xp-pop { background:rgba(245,166,35,.15); border:1px solid rgba(245,166,35,.35); border-radius:100px; padding:4px 10px; display:flex; align-items:center; gap:5px; width:fit-content; margin:2px auto; }
+    .xp-pop span { font-size:.6rem; font-weight:600; color:var(--orange); }
+    .chat-wrap.playing .cm13 { animation:xpPop 3s ease forwards; animation-delay:7.0s; }
+
+    /* Input bar */
+    .chat-input { display:flex; align-items:center; gap:6px; padding:8px 10px; background:#1A140D; border-top:1px solid rgba(255,255,255,.05); }
+    .chat-input-field { flex:1; background:rgba(240,230,208,.07); border-radius:16px; padding:5px 10px; font-size:.6rem; color:var(--c30); }
+    .chat-input-btn { width:24px; height:24px; border-radius:50%; background:var(--orange); display:flex; align-items:center; justify-content:center; font-size:.6rem; flex-shrink:0; }
+
+    /* ════════════════════════
+       5. HUEVO — INTERACCIÓN
+    ════════════════════════ */
+    #egg-section { padding:88px 0; text-align:center; background:var(--bg); }
+    .egg-btn-wrap { position:relative; display:inline-block; cursor:pointer; }
+    .egg-btn-wrap .egg-glow { position:absolute; inset:-60px; background:radial-gradient(ellipse at center,rgba(245,166,35,.14) 0%,transparent 65%); border-radius:50%; animation:pulseGlow 3s ease-in-out infinite; }
+    .egg-interactive { width:220px; height:auto; position:relative; z-index:1; filter:drop-shadow(0 0 24px rgba(245,166,35,.45)); animation:floatY 3.5s ease-in-out infinite; transition:filter .3s; }
+    .egg-btn-wrap:hover .egg-interactive { filter:drop-shadow(0 0 44px rgba(245,166,35,.7)); }
+    .tap-hint { margin-top:20px; font-size:.82rem; color:var(--c30); letter-spacing:.07em; transition:opacity .4s; }
+    .egg-reveal { display:none; margin:44px auto 0; padding:32px 28px; max-width:380px; background:rgba(245,166,35,.05); border:1px solid rgba(245,166,35,.2); border-radius:var(--r); }
+    .egg-reveal.on { display:block; animation:fadeUp .5s ease; }
+    .egg-reveal p { font-family:'Playfair Display',serif; font-style:italic; font-size:1.05rem; color:var(--c60); margin-bottom:22px; line-height:1.65; }
+
+    /* ════════════════════════
+       6. ETAPAS — TIMELINE
+    ════════════════════════ */
+    #etapas { padding:88px 0; }
+    #etapas .sec-title { margin-bottom:48px; }
+
+    .timeline-scroll { overflow-x:auto; padding-bottom:16px; -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:var(--or20) transparent; }
+    .timeline-scroll::-webkit-scrollbar { height:3px; }
+    .timeline-scroll::-webkit-scrollbar-thumb { background:var(--or20); border-radius:2px; }
+
+    .timeline-track { display:flex; align-items:flex-start; padding:0 24px 4px; gap:0; width:fit-content; margin:0 auto; }
+
+    .evo-node { display:flex; flex-direction:column; align-items:center; width:160px; position:relative; }
+
+    /* Connector: horizontal dashed line at baseline level */
+    .evo-node:not(:last-child)::after {
+      content:''; position:absolute;
+      top:108px;
+      left:calc(50% + 36px);
+      width:calc(160px - 72px);
+      border-top:2px dashed rgba(245,166,35,.22);
+    }
+
+    /* Image frame — fixed height, characters bottom-aligned */
+    .evo-frame {
+      width:120px; height:120px;
+      display:flex; align-items:flex-end; justify-content:center;
+      margin-bottom:12px;
+    }
+    .evo-frame img {
+      max-width:100%; max-height:100%; object-fit:contain;
+      filter:drop-shadow(0 6px 14px rgba(245,166,35,.3));
+      transition:transform .3s,filter .3s;
+    }
+    .evo-node:hover .evo-frame img { transform:translateY(-6px) scale(1.07); filter:drop-shadow(0 10px 22px rgba(245,166,35,.55)); }
+
+    /* Stage badge */
+    .evo-badge { width:28px; height:28px; border-radius:50%; background:var(--bg); border:2px solid rgba(245,166,35,.35); display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-weight:700; font-size:.82rem; color:var(--orange); margin-bottom:10px; transition:border-color .3s,box-shadow .3s; }
+    .evo-node:hover .evo-badge { border-color:var(--orange); box-shadow:0 0 10px rgba(245,166,35,.4); }
+    .evo-badge.last { border-color:var(--orange); box-shadow:0 0 14px rgba(245,166,35,.45); animation:pulseGlow 2.5s ease-in-out infinite; }
+
+    .evo-name { font-family:'Playfair Display',serif; font-weight:700; font-size:.95rem; text-align:center; margin-bottom:5px; }
+    .evo-desc { font-size:.74rem; color:var(--c60); text-align:center; line-height:1.5; padding:0 8px; }
+    .evo-desc.ghost { color:var(--orange); font-style:italic; }
+
+    /* Placeholder when image missing */
+    .evo-ph { width:72px; height:72px; border-radius:50%; background:rgba(245,166,35,.08); border:2px solid rgba(245,166,35,.25); display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:rgba(245,166,35,.6); }
+    .evo-ph.ghost-ph { background:rgba(240,230,208,.06); border-color:rgba(240,230,208,.2); color:rgba(240,230,208,.4); animation:pulseGlow 2.5s ease-in-out infinite; }
+
+    /* ════════════════════════
+       7. LORE
+    ════════════════════════ */
+    #lore { padding:88px 0; background:var(--bg2); position:relative; }
+    #lore::before { content:''; position:absolute; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E"); pointer-events:none; }
+    .lore-grid { display:grid; grid-template-columns:1fr 1px 1fr; gap:64px; align-items:start; position:relative; z-index:1; }
+    .lore-sep { background:linear-gradient(to bottom,transparent,var(--c30),transparent); align-self:stretch; }
+    .lore-col { display:flex; flex-direction:column; gap:16px; }
+    .lore-tag { font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--orange); font-weight:500; }
+    .lore-col h3 { font-family:'Playfair Display',serif; font-size:1.5rem; }
+    .lore-col p { font-family:'Playfair Display',serif; font-style:italic; font-size:1.05rem; line-height:1.85; color:var(--c60); }
+
+    /* ════════════════════════
+       8. CTA FINAL
+    ════════════════════════ */
+    #cta-final { padding:112px 0; text-align:center; }
+    .cta-inner { display:flex; flex-direction:column; align-items:center; gap:22px; }
+    .cta-inner h2 { font-style:italic; }
+    .cta-sub { font-size:.98rem; color:var(--c60); max-width:340px; line-height:1.7; }
+    .qr-deco { opacity:.16; margin-top:8px; }
+    .cta-micro { font-size:.77rem; color:var(--c30); letter-spacing:.05em; }
+
+    /* ════════════════════════
+       9. FOOTER
+    ════════════════════════ */
+    footer { border-top:1px solid var(--c15); padding:44px 0; position:relative; z-index:1; }
+    .footer-row { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px; }
+    .logo { display:flex; align-items:baseline; gap:1px; }
+    .logo-e  { font-family:'Playfair Display',serif; font-size:2rem; font-weight:700; color:var(--orange); line-height:1; }
+    .logo-co { font-family:'Inter',sans-serif; font-size:1.05rem; font-weight:300; letter-spacing:.1em; }
+    .footer-tag { font-size:.8rem; color:var(--c30); margin-top:3px; letter-spacing:.03em; }
+    .footer-links { display:flex; gap:24px; font-size:.84rem; color:var(--c60); }
+    .footer-links a:hover { color:var(--cream); }
+    .footer-copy { font-size:.74rem; color:var(--c30); }
+
+    /* ════════════════════════
+       RESPONSIVE
+    ════════════════════════ */
+    @media (max-width:960px) {
+      .hero-grid,.demo-grid { grid-template-columns:1fr; gap:36px; text-align:center; }
+      .hero-right { order:-1; }
+      .phone-wrap .phone { transform:none; }
+      .demo-left { align-items:center; }
+      .demo-left p { max-width:100%; }
+      .egg-wrap { width:clamp(180px,55vw,260px); }
+      .hero-cta,.badge { align-items:center; }
+      .hero-sub { max-width:100%; }
+      .steps { grid-template-columns:1fr; gap:16px; }
+      .lore-grid { grid-template-columns:1fr; gap:40px; }
+      .lore-sep { display:none; }
+      .footer-row { flex-direction:column; text-align:center; }
+      .footer-links { justify-content:center; }
+    }
+    @media (max-width:600px) {
+      #hero { padding:56px 0 44px; }
+      #como,#demo,#egg-section,#etapas,#lore,#cta-final { padding:64px 0; }
+      .sec-title { margin-bottom:36px; }
+      .step-card { padding:24px 18px; }
+      .evo-node { width:130px; }
+      .evo-frame { width:100px; height:100px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ 1. HERO ══ -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div class="hero-left">
+        <span class="badge">
+          <span class="badge-dot"></span>
+          BETA &nbsp;·&nbsp; Solo WhatsApp
+        </span>
+        <h1 class="hero-title">
+          Algo antiguo<br><span class="accent">despertó.</span>
+        </h1>
+        <p class="hero-sub">Criá tu Eco. Completá misiones.<br>Evolucioná juntos.</p>
+        <div class="hero-cta">
+          <a href="https://wa.me/NUMERO" class="btn" target="_blank" rel="noopener">Despertar mi Eco &nbsp;→</a>
+          <p class="micro">Gratis &nbsp;·&nbsp; Sin app &nbsp;·&nbsp; Solo WhatsApp</p>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="egg-wrap">
+          <div class="egg-glow"></div>
+          <img src="eco-egg-nobg.png" alt="Huevo ECO" class="egg-img" />
+          <div class="particle p1"></div><div class="particle p2"></div>
+          <div class="particle p3"></div><div class="particle p4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 2. SOCIAL PROOF ══ -->
+<section id="social-proof">
+  <div class="container">
+    <div class="counter-wrap">
+      <span style="font-size:1.4rem">🥚</span>
+      <p class="counter-text"><span id="ecoCount">2.500</span> Ecos esperando despertar</p>
+    </div>
+  </div>
+</section>
+
+<!-- DIVIDER -->
+<div class="divider">
+  <svg viewBox="0 0 560 22" fill="none"><path d="M0 11 Q47 4 94 11 Q141 18 188 11 Q235 4 280 11 Q325 18 372 11 Q419 4 466 11 Q513 18 560 11" stroke="#F0E6D0" stroke-width=".8"/><circle cx="280" cy="11" r="4" fill="#F0E6D0"/><circle cx="140" cy="11" r="2.5" fill="#F0E6D0"/><circle cx="420" cy="11" r="2.5" fill="#F0E6D0"/><circle cx="56" cy="11" r="1.5" fill="#F0E6D0"/><circle cx="504" cy="11" r="1.5" fill="#F0E6D0"/></svg>
+</div>
+
+<!-- ══ 3. CÓMO FUNCIONA ══ -->
+<section id="como">
+  <div class="container">
+    <div class="sec-title"><h2>Así nace el vínculo</h2></div>
+    <div class="steps">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <svg class="step-icon" viewBox="0 0 36 36" fill="none"><path d="M5 8a4 4 0 014-4h18a4 4 0 014 4v14a4 4 0 01-4 4H21l-6 4v-4H9a4 4 0 01-4-4V8z" stroke="#F0E6D0" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="15" r="1.5" fill="#F0E6D0"/><circle cx="18" cy="15" r="1.5" fill="#F0E6D0"/><circle cx="24" cy="15" r="1.5" fill="#F0E6D0"/></svg>
+        <h3>Escribile</h3>
+        <p>Mandá un mensaje a ECO por WhatsApp. Sin apps, sin cuentas. Solo vos y él.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <svg class="step-icon" viewBox="0 0 36 36" fill="none"><ellipse cx="18" cy="21" rx="12" ry="9" stroke="#F0E6D0" stroke-width="1.5"/><path d="M18 12 C18 8 24 6 24 12" stroke="#F0E6D0" stroke-width="1.5" stroke-linecap="round"/><circle cx="15" cy="20" r="1.5" fill="#F0E6D0"/><circle cx="21" cy="20" r="1.5" fill="#F0E6D0"/><path d="M15 24 Q18 26 21 24" stroke="#F0E6D0" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <h3>Él responde</h3>
+        <p>Tu Eco tiene personalidad propia. Aprende, reacciona y crece con cada conversación.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <svg class="step-icon" viewBox="0 0 36 36" fill="none"><path d="M18 4L21.5 13.5L32 13.5L23.5 19.5L26.5 29L18 23.5L9.5 29L12.5 19.5L4 13.5L14.5 13.5Z" stroke="#F0E6D0" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        <h3>Evoluciona</h3>
+        <p>Completá misiones, cuidá a tu Eco y guialo a través de las 7 etapas de su vida.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIVIDER -->
+<div class="divider" style="padding:20px 24px">
+  <svg viewBox="0 0 560 22" fill="none"><line x1="0" y1="11" x2="248" y2="11" stroke="#F0E6D0" stroke-width=".8"/><path d="M254 11L264 5L274 11L264 17Z" stroke="#F0E6D0" stroke-width=".8" fill="none"/><path d="M280 11L290 5L300 11L290 17Z" stroke="#F0E6D0" stroke-width=".8" fill="none"/><line x1="306" y1="11" x2="560" y2="11" stroke="#F0E6D0" stroke-width=".8"/></svg>
+</div>
+
+<!-- ══ 4. DEMO — PHONE MOCK ══ -->
+<section id="demo">
+  <div class="container">
+    <div class="demo-grid">
+
+      <!-- Left copy -->
+      <div class="demo-left">
+        <h2>Mantené vivo<br>a tu <span style="color:var(--orange)">Eco.</span></h2>
+        <p>Cada día, tu Eco necesita tu atención. Responde a sus mensajes, alimentalo y completá misiones para que evolucione.</p>
+        <div class="demo-features">
+          <div class="demo-feat">
+            <div class="feat-icon">🍔</div>
+            <div class="feat-text">
+              <strong>Necesita comer</strong>
+              <span>Preguntale qué quiere y mandáselo. Sí, en stickers.</span>
+            </div>
+          </div>
+          <div class="demo-feat">
+            <div class="feat-icon">💤</div>
+            <div class="feat-text">
+              <strong>Descansa con vos</strong>
+              <span>Si no lo atendés, se pone triste. Y lo hace saber.</span>
+            </div>
+          </div>
+          <div class="demo-feat">
+            <div class="feat-icon">⚡</div>
+            <div class="feat-text">
+              <strong>Evoluciona con misiones</strong>
+              <span>Cada interacción suma puntos hacia la próxima etapa.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: phone -->
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="island"></div>
+          <div class="status-bar">
+            <span>9:41</span>
+            <span style="display:flex;gap:4px;align-items:center">
+              <svg width="12" height="8" viewBox="0 0 12 8" fill="rgba(240,230,208,.5)"><rect x="0" y="3" width="2" height="5"/><rect x="3" y="2" width="2" height="6"/><rect x="6" y="1" width="2" height="7"/><rect x="9" y="0" width="2" height="8"/></svg>
+              <svg width="12" height="8" viewBox="0 0 16 12" fill="none" stroke="rgba(240,230,208,.5)" stroke-width="1.5"><path d="M1 4a9 9 0 0114 0M4 7a5 5 0 018 0M7 10a2 2 0 012 0"/></svg>
+              🔋
+            </span>
+          </div>
+
+          <div class="chat-head">
+            <div class="eco-avatar">
+              <img src="eco-evo-1-infante.png" alt="ECO" onerror="this.style.display='none';this.parentElement.textContent='🐾'" />
+            </div>
+            <div class="chat-head-info">
+              <div class="chat-head-name">Eco Pulso</div>
+              <div class="chat-head-status">en línea</div>
+            </div>
+            <div class="chat-head-dots"><span></span><span></span><span></span></div>
+          </div>
+
+          <div class="chat-body chat-wrap" id="chatWrap">
+
+            <!-- m1: system alert -->
+            <div class="cmsg cm1">
+              <div class="sys-notif">
+                <span>⚡ ¡Tu Eco tiene hambre!</span>
+              </div>
+            </div>
+
+            <!-- m2: ECO first msg -->
+            <div class="cmsg cm2">
+              <div class="eco-row">
+                <div class="eco-av-sm"><img src="eco-evo-1-infante.png" alt="" onerror="this.parentElement.textContent='🐾'"/></div>
+                <div class="eco-bubble">...ey 🥺<br>me muero de hambre</div>
+              </div>
+            </div>
+
+            <!-- m3: user asks -->
+            <div class="cmsg cm3">
+              <div class="user-row">
+                <div class="user-bubble">¿qué querés comer? 🤔</div>
+              </div>
+            </div>
+
+            <!-- m4: typing -->
+            <div class="cmsg cm4">
+              <div class="eco-row">
+                <div class="eco-av-sm"><img src="eco-evo-1-infante.png" alt="" onerror="this.parentElement.textContent='🐾'"/></div>
+                <div class="typing-indicator"><div class="td"></div><div class="td"></div><div class="td"></div></div>
+              </div>
+            </div>
+
+            <!-- m5: ECO answer -->
+            <div class="cmsg cm5">
+              <div class="eco-row">
+                <div class="eco-av-sm"><img src="eco-evo-1-infante.png" alt="" onerror="this.parentElement.textContent='🐾'"/></div>
+                <div class="eco-bubble">🍔🍔🍔<br><span style="opacity:.7">¡una hamburguesa<br>por favorrr!</span></div>
+              </div>
+            </div>
+
+            <!-- m6-m11: burger stickers from user -->
+            <div class="cmsg cm6"><div class="sticker-row"><div class="sticker">🍔</div></div></div>
+            <div class="cmsg cm7"><div class="sticker-row"><div class="sticker">🍔</div></div></div>
+            <div class="cmsg cm8"><div class="sticker-row"><div class="sticker">🍔</div></div></div>
+            <div class="cmsg cm9"><div class="sticker-row"><div class="sticker">🍔</div></div></div>
+            <div class="cmsg cm10"><div class="sticker-row"><div class="sticker">🍔</div></div></div>
+            <div class="cmsg cm11"><div class="sticker-row"><div class="sticker">🍔</div></div></div>
+
+            <!-- m12: ECO reaction -->
+            <div class="cmsg cm12">
+              <div class="eco-row">
+                <div class="eco-av-sm"><img src="eco-evo-1-infante.png" alt="" onerror="this.parentElement.textContent='🐾'"/></div>
+                <div class="eco-bubble">😭🙏 ¡¡GENIAAAA!!</div>
+              </div>
+            </div>
+
+            <!-- m13: XP pop -->
+            <div class="cmsg cm13">
+              <div class="xp-pop">
+                <span>+12 ❤️ &nbsp;felicidad</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Input bar -->
+          <div class="chat-input">
+            <div class="chat-input-field">Escribí un mensaje...</div>
+            <div class="chat-input-btn">📎</div>
+            <div class="chat-input-btn" style="background:var(--orange)">➤</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- DIVIDER -->
+<div class="divider" style="padding:20px 24px">
+  <svg viewBox="0 0 560 22" fill="none"><line x1="0" y1="11" x2="248" y2="11" stroke="#F0E6D0" stroke-width=".8"/><path d="M254 11L264 5L274 11L264 17Z" stroke="#F0E6D0" stroke-width=".8" fill="none"/><path d="M280 11L290 5L300 11L290 17Z" stroke="#F0E6D0" stroke-width=".8" fill="none"/><line x1="306" y1="11" x2="560" y2="11" stroke="#F0E6D0" stroke-width=".8"/></svg>
+</div>
+
+<!-- ══ 5. HUEVO — INTERACCIÓN ══ -->
+<section id="egg-section">
+  <div class="container">
+    <div class="sec-title" style="margin-bottom:44px">
+      <h2>Antes del nombre,<br>existe el pulso.</h2>
+    </div>
+    <div class="egg-btn-wrap" id="eggBtn">
+      <div class="egg-glow"></div>
+      <img src="eco-egg-nobg.png" alt="Huevo ECO" class="egg-interactive" id="eggInteract" />
+    </div>
+    <p class="tap-hint" id="tapHint">Tocá para despertar a tu Eco</p>
+    <div class="egg-reveal" id="eggReveal">
+      <p>"Tu Eco Pulso está listo.<br>¿Lo despertás?"</p>
+      <a href="https://wa.me/NUMERO" class="btn" target="_blank" rel="noopener">Despertar ahora &nbsp;→</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 6. ETAPAS ══ -->
+<section id="etapas">
+  <div class="container">
+    <div class="sec-title"><h2 style="font-style:italic">El camino del Eco</h2></div>
+  </div>
+
+  <div class="timeline-scroll">
+    <div class="timeline-track">
+
+      <div class="evo-node">
+        <div class="evo-frame"><img src="eco-egg-nobg.png" alt="Huevo" /></div>
+        <div class="evo-badge">1</div>
+        <div class="evo-name">Huevo</div>
+        <div class="evo-desc">Dormido.<br>Esperando la chispa.</div>
+      </div>
+
+      <div class="evo-node">
+        <div class="evo-frame">
+          <img src="eco-evo-1-infante.png" alt="Infante" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="evo-ph" style="display:none">2</div>
+        </div>
+        <div class="evo-badge">2</div>
+        <div class="evo-name">Infante</div>
+        <div class="evo-desc">Curioso.<br>Descubre el mundo.</div>
+      </div>
+
+      <div class="evo-node">
+        <div class="evo-frame">
+          <img src="eco-evo-2-adolescente.png" alt="Adolescente" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="evo-ph" style="display:none">3</div>
+        </div>
+        <div class="evo-badge">3</div>
+        <div class="evo-name">Adolescente</div>
+        <div class="evo-desc">Rebelde.<br>Desafía los límites.</div>
+      </div>
+
+      <div class="evo-node">
+        <div class="evo-frame">
+          <img src="eco-evo-3-adulto.png" alt="Adulto" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="evo-ph" style="display:none">4</div>
+        </div>
+        <div class="evo-badge">4</div>
+        <div class="evo-name">Adulto</div>
+        <div class="evo-desc">Pleno.<br>En su mejor versión.</div>
+      </div>
+
+      <div class="evo-node">
+        <div class="evo-frame">
+          <img src="eco-evo-4-anciano.png" alt="Anciano" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="evo-ph" style="display:none">5</div>
+        </div>
+        <div class="evo-badge">5</div>
+        <div class="evo-name">Anciano</div>
+        <div class="evo-desc">Sabio.<br>Guía a los demás.</div>
+      </div>
+
+      <div class="evo-node">
+        <div class="evo-frame">
+          <img src="eco-evo-5-fantasma.png" alt="Fantasma" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="evo-ph ghost-ph" style="display:none">✦</div>
+        </div>
+        <div class="evo-badge last">6</div>
+        <div class="evo-name">Fantasma</div>
+        <div class="evo-desc ghost">Destino final...<br>¿o comienzo?</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- DIVIDER -->
+<div class="divider" style="padding:20px 24px 44px">
+  <svg viewBox="0 0 560 22" fill="none"><path d="M0 11 Q47 4 94 11 Q141 18 188 11 Q235 4 280 11 Q325 18 372 11 Q419 4 466 11 Q513 18 560 11" stroke="#F0E6D0" stroke-width=".8"/><circle cx="280" cy="11" r="4" fill="#F0E6D0"/><circle cx="140" cy="11" r="2.5" fill="#F0E6D0"/><circle cx="420" cy="11" r="2.5" fill="#F0E6D0"/></svg>
+</div>
+
+<!-- ══ 7. LORE ══ -->
+<section id="lore">
+  <div class="container">
+    <div class="lore-grid">
+      <div class="lore-col">
+        <span class="lore-tag">— La Trama</span>
+        <h3>La red invisible</h3>
+        <p>La red invisible que conecta a todos los Ecos. Fragmentada. Olvidada. Esperando ser restaurada.</p>
+      </div>
+      <div class="lore-sep"></div>
+      <div class="lore-col">
+        <span class="lore-tag">— El Silencio</span>
+        <h3>La fuerza que apaga</h3>
+        <p>La fuerza que apaga, borra, desconecta. Avanza despacio. Pero avanza.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 8. CTA FINAL ══ -->
+<section id="cta-final">
+  <div class="container">
+    <div class="cta-inner">
+      <h2>¿Estás listo?</h2>
+      <p class="cta-sub">Tu Eco Pulso lleva tiempo esperando. Ya es hora.</p>
+      <a href="https://wa.me/NUMERO" class="btn btn-lg" target="_blank" rel="noopener">Iniciar en WhatsApp &nbsp;→</a>
+      <div class="qr-deco">
+        <svg width="76" height="76" viewBox="0 0 80 80" fill="none"><rect x="2" y="2" width="28" height="28" rx="4" stroke="#F0E6D0" stroke-width="2"/><rect x="10" y="10" width="12" height="12" rx="2" fill="#F0E6D0"/><rect x="50" y="2" width="28" height="28" rx="4" stroke="#F0E6D0" stroke-width="2"/><rect x="58" y="10" width="12" height="12" rx="2" fill="#F0E6D0"/><rect x="2" y="50" width="28" height="28" rx="4" stroke="#F0E6D0" stroke-width="2"/><rect x="10" y="58" width="12" height="12" rx="2" fill="#F0E6D0"/><rect x="50" y="50" width="8" height="8" rx="1" fill="#F0E6D0"/><rect x="62" y="50" width="8" height="8" rx="1" fill="#F0E6D0"/><rect x="50" y="62" width="8" height="8" rx="1" fill="#F0E6D0"/><rect x="62" y="62" width="8" height="8" rx="1" fill="#F0E6D0"/></svg>
+      </div>
+      <p class="cta-micro">Gratis &nbsp;·&nbsp; Sin descargas &nbsp;·&nbsp; Funciona en cualquier celular</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 9. FOOTER ══ -->
+<footer>
+  <div class="container">
+    <div class="footer-row">
+      <div>
+        <div class="logo"><span class="logo-e">E</span><span class="logo-co">CO</span></div>
+        <p class="footer-tag">Un juego que vive en tu conversación.</p>
+      </div>
+      <div class="footer-links"><a href="#">Instagram</a><a href="#">Contacto</a></div>
+      <p class="footer-copy">© 2025 ECO</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── Counter ─────────────────────────────────────────
+(function(){
+  var el=document.getElementById('ecoCount'), start=2500, end=2847, dur=2800, t0=null;
+  function ease(t){return 1-Math.pow(1-t,3);}
+  function fmt(n){return Math.floor(n).toLocaleString('es-AR');}
+  function run(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/dur,1);el.textContent=fmt(start+(end-start)*ease(p));if(p<1)requestAnimationFrame(run);}
+  var obs=new IntersectionObserver(function(e){if(e[0].isIntersecting){requestAnimationFrame(run);obs.disconnect();}},{threshold:.5});
+  obs.observe(document.getElementById('social-proof'));
+})();
+
+// ── Phone chat animation ─────────────────────────────
+(function(){
+  var wrap = document.getElementById('chatWrap');
+  var played = false;
+  var obs = new IntersectionObserver(function(e){
+    if(e[0].isIntersecting && !played){
+      played = true;
+      wrap.classList.add('playing');
+      // Auto-scroll chat as messages appear
+      var delays = [400,1100,2000,2900,3700,4500,4720,4940,5160,5380,5600,6300,7000];
+      delays.forEach(function(d){
+        setTimeout(function(){ wrap.scrollTop = wrap.scrollHeight; }, d+400);
+      });
+      // Loop: restart after 10s pause
+      setTimeout(function loop(){
+        wrap.classList.remove('playing');
+        wrap.scrollTop = 0;
+        setTimeout(function(){ wrap.classList.add('playing'); setTimeout(loop, 11000); }, 800);
+      }, 11000);
+    }
+  },{threshold:.4});
+  obs.observe(document.getElementById('demo'));
+})();
+
+// ── Egg interaction ─────────────────────────────────
+(function(){
+  var btn=document.getElementById('eggBtn'), img=document.getElementById('eggInteract');
+  var reveal=document.getElementById('eggReveal'), hint=document.getElementById('tapHint');
+  var done=false;
+  btn.addEventListener('click',function(){
+    if(done)return;
+    img.style.animation='none'; img.classList.add('egg-shaking');
+    img.addEventListener('animationend',function h(){
+      img.removeEventListener('animationend',h);
+      img.classList.remove('egg-shaking'); img.style.animation='';
+      done=true; hint.style.opacity='0'; reveal.classList.add('on');
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
