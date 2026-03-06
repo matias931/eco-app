@@ -24,13 +24,14 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const body = req.body;
 
-    // Meta siempre espera un 200 rápido, aunque no procesemos
-    res.status(200).send('OK');
-
-    if (body.object !== 'whatsapp_business_account') return;
+    if (body.object !== 'whatsapp_business_account') {
+      return res.status(200).send('OK');
+    }
 
     const message = body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
-    if (!message || message.type !== 'text') return;
+    if (!message || message.type !== 'text') {
+      return res.status(200).send('OK');
+    }
 
     const from = message.from;         // número del usuario
     const text = message.text.body;    // texto que mandó
@@ -40,7 +41,7 @@ export default async function handler(req, res) {
     // Respuesta fija (Paso 1 — sin IA todavía)
     await sendWhatsApp(from, '🐾 Hola, soy ECO. ¡Estoy despertando!\n\nEste es el primer latido. Pronto podrás criarme. 🥚');
 
-    return;
+    return res.status(200).send('OK');
   }
 
   res.status(405).send('Method Not Allowed');
