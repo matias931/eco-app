@@ -168,7 +168,7 @@
     /* Chat header */
     .chat-head { background:#1A140D; padding:8px 12px; display:flex; align-items:center; gap:8px; border-bottom:1px solid rgba(255,255,255,.05); }
     .eco-avatar { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#F5A623,#C06A00); display:flex; align-items:center; justify-content:center; font-size:.85rem; flex-shrink:0; overflow:hidden; }
-    .eco-avatar img { width:100%; height:100%; object-fit:cover; }
+    .eco-avatar img { width:100%; height:100%; object-fit:cover; filter:brightness(1.05) saturate(1.1); image-rendering:-webkit-optimize-contrast; }
     .chat-head-info { flex:1; }
     .chat-head-name { font-size:.72rem; font-weight:600; color:var(--cream); }
     .chat-head-status { font-size:.58rem; color:var(--orange); }
@@ -270,10 +270,11 @@
     }
     .evo-frame img {
       max-width:100%; max-height:100%; object-fit:contain;
-      filter:drop-shadow(0 6px 14px rgba(245,166,35,.3));
-      transition:transform .3s,filter .3s;
+      filter:drop-shadow(0 6px 16px rgba(245,166,35,.35)) brightness(1.05) saturate(1.1);
+      transition:transform .4s cubic-bezier(.34,1.56,.64,1), filter .4s ease;
+      image-rendering: -webkit-optimize-contrast;
     }
-    .evo-node:hover .evo-frame img { transform:translateY(-6px) scale(1.07); filter:drop-shadow(0 10px 22px rgba(245,166,35,.55)); }
+    .evo-node:hover .evo-frame img { transform:translateY(-7px) scale(1.08); filter:drop-shadow(0 12px 26px rgba(245,166,35,.6)) brightness(1.1) saturate(1.15); }
 
     /* Stage badge */
     .evo-badge { width:28px; height:28px; border-radius:50%; background:var(--bg); border:2px solid rgba(245,166,35,.35); display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-weight:700; font-size:.82rem; color:var(--orange); margin-bottom:10px; transition:border-color .3s,box-shadow .3s; }
@@ -447,7 +448,7 @@
 
           <div class="chat-head">
             <div class="eco-avatar">
-              <img src="eco-evo-1-infante.png" alt="ECO" onerror="this.style.display='none';this.parentElement.textContent='🐾'" />
+              <img src="infante.png" alt="ECO" onerror="this.style.display='none';this.parentElement.textContent='🐾'" />
             </div>
             <div class="chat-head-info">
               <div class="chat-head-name">Eco Pulso</div>
@@ -468,7 +469,7 @@
             <!-- m2: ECO first msg -->
             <div class="cmsg cm2">
               <div class="eco-row">
-                <div class="eco-av-sm"><img src="eco-evo-1-infante.png" alt="" onerror="this.parentElement.textContent='🐾'"/></div>
+                <div class="eco-av-sm"><img src="infante.png" alt="" onerror="this.parentElement.textContent='🐾'"/></div>
                 <div class="eco-bubble">...ey 🥺<br>me muero de hambre</div>
               </div>
             </div>
@@ -483,7 +484,7 @@
             <!-- m4: typing -->
             <div class="cmsg cm4">
               <div class="eco-row">
-                <div class="eco-av-sm"><img src="eco-evo-1-infante.png" alt="" onerror="this.parentElement.textContent='🐾'"/></div>
+                <div class="eco-av-sm"><img src="infante.png" alt="" onerror="this.parentElement.textContent='🐾'"/></div>
                 <div class="typing-indicator"><div class="td"></div><div class="td"></div><div class="td"></div></div>
               </div>
             </div>
@@ -491,7 +492,7 @@
             <!-- m5: ECO answer -->
             <div class="cmsg cm5">
               <div class="eco-row">
-                <div class="eco-av-sm"><img src="eco-evo-1-infante.png" alt="" onerror="this.parentElement.textContent='🐾'"/></div>
+                <div class="eco-av-sm"><img src="infante.png" alt="" onerror="this.parentElement.textContent='🐾'"/></div>
                 <div class="eco-bubble">🍔🍔🍔<br><span style="opacity:.7">¡una hamburguesa<br>por favorrr!</span></div>
               </div>
             </div>
@@ -504,7 +505,7 @@
             <!-- m12: ECO reaction -->
             <div class="cmsg cm12">
               <div class="eco-row">
-                <div class="eco-av-sm"><img src="eco-evo-1-infante.png" alt="" onerror="this.parentElement.textContent='🐾'"/></div>
+                <div class="eco-av-sm"><img src="infante.png" alt="" onerror="this.parentElement.textContent='🐾'"/></div>
                 <div class="eco-bubble">🥹 gracias…<br><span style="opacity:.7">lo necesitaba</span></div>
               </div>
             </div>
@@ -604,7 +605,7 @@
 
       <div class="evo-node">
         <div class="evo-frame">
-          <img src="eco-evo-1-infante.png" alt="Infante" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <img src="infante.png" alt="Infante" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="evo-ph" style="display:none">2</div>
         </div>
         <div class="evo-badge">2</div>
@@ -614,7 +615,7 @@
 
       <div class="evo-node">
         <div class="evo-frame">
-          <img src="eco-evo-2-adolescente.png" alt="Adolescente" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <img src="adolescente.png" alt="Adolescente" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="evo-ph" style="display:none">3</div>
         </div>
         <div class="evo-badge">3</div>
@@ -624,7 +625,7 @@
 
       <div class="evo-node">
         <div class="evo-frame">
-          <img src="eco-evo-3-adulto.png" alt="Adulto" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <img src="adulto.png" alt="Adulto" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="evo-ph" style="display:none">4</div>
         </div>
         <div class="evo-badge">4</div>
@@ -634,7 +635,7 @@
 
       <div class="evo-node">
         <div class="evo-frame">
-          <img src="eco-evo-4-anciano.png" alt="Anciano" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <img src="anciano.png" alt="Anciano" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="evo-ph" style="display:none">5</div>
         </div>
         <div class="evo-badge">5</div>
@@ -644,7 +645,7 @@
 
       <div class="evo-node">
         <div class="evo-frame">
-          <img src="eco-evo-5-fantasma.png" alt="Fantasma" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <img src="Fantasma.png" alt="Fantasma" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="evo-ph ghost-ph" style="display:none">✦</div>
         </div>
         <div class="evo-badge last">6</div>
