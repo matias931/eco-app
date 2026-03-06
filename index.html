@@ -120,9 +120,9 @@
     .sec-title { text-align:center; margin-bottom:56px; }
 
     .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
-    .step-card { padding:32px 24px; border-radius:var(--r); background:rgba(240,230,208,.03); border:1px solid var(--c15); display:flex; flex-direction:column; gap:14px; transition:border-color .3s,transform .3s; }
-    .step-card:hover { border-color:var(--or20); transform:translateY(-4px); }
-    .step-num { font-family:'Playfair Display',serif; font-size:3.2rem; font-weight:700; color:rgba(245,166,35,.2); line-height:1; }
+    .step-card { padding:32px 24px; border-radius:var(--r); background:rgba(240,230,208,.06); border:1px solid rgba(240,230,208,.12); box-shadow:0 0 28px rgba(245,166,35,.04) inset; display:flex; flex-direction:column; gap:14px; transition:border-color .3s,transform .3s,box-shadow .3s; }
+    .step-card:hover { border-color:rgba(245,166,35,.35); transform:translateY(-4px); box-shadow:0 0 40px rgba(245,166,35,.08) inset; }
+    .step-num { font-family:'Playfair Display',serif; font-size:3.2rem; font-weight:700; color:rgba(245,166,35,.45); line-height:1; text-shadow:0 0 20px rgba(245,166,35,.3); }
     .step-icon { width:34px; height:34px; }
     .step-card h3 { font-size:1.2rem; }
     .step-card p { color:var(--c60); font-size:.93rem; line-height:1.65; }
