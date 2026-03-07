@@ -21,19 +21,20 @@ export default async function handler(req, res) {
 
   // ── POST: mensaje entrante de WhatsApp → reenviar a n8n ────────────
   if (req.method === 'POST') {
-    // Responder a Meta inmediatamente (evita timeout)
-    res.status(200).send('OK');
-
     try {
       const body = req.body;
 
-      if (body.object !== 'whatsapp_business_account') return;
+      if (body.object !== 'whatsapp_business_account') {
+        return res.status(200).send('OK');
+      }
 
       const entry   = body.entry?.[0];
       const change  = entry?.changes?.[0]?.value;
       const message = change?.messages?.[0];
 
-      if (!message) return;
+      if (!message) {
+        return res.status(200).send('OK');
+      }
 
       const phone    = message.from;
       const type     = message.type;
@@ -42,7 +43,7 @@ export default async function handler(req, res) {
 
       console.log(`📩 Mensaje de ${phone}: ${text || `[${type}]`}`);
 
-      // Reenviar a n8n con toda la info relevante
+      // Reenviar a n8n ANTES de responder a Meta
       if (N8N_WEBHOOK_URL) {
         await fetch(N8N_WEBHOOK_URL, {
           method: 'POST',
@@ -65,7 +66,8 @@ export default async function handler(req, res) {
       console.error('❌ Error procesando mensaje:', err.message);
     }
 
-    return;
+    // Responder a Meta al final (tiene hasta 20s, sobra tiempo)
+    return res.status(200).send('OK');
   }
 
   res.status(405).send('Method Not Allowed');
