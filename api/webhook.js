@@ -1,9 +1,8 @@
 // ECO — WhatsApp Webhook
-// Paso 1: Recibe mensajes y responde con texto fijo (sin IA, sin DB)
+// Recibe mensajes de Meta y los reenvía a n8n para procesamiento
 
-const VERIFY_TOKEN   = process.env.VERIFY_TOKEN;
-const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
-const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
+const VERIFY_TOKEN    = process.env.VERIFY_TOKEN;
+const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL;
 
 export default async function handler(req, res) {
 
@@ -20,55 +19,54 @@ export default async function handler(req, res) {
     return res.status(403).send('Token incorrecto');
   }
 
-  // ── POST: mensaje entrante de WhatsApp ─────────────────────────────
+  // ── POST: mensaje entrante de WhatsApp → reenviar a n8n ────────────
   if (req.method === 'POST') {
-    const body = req.body;
+    // Responder a Meta inmediatamente (evita timeout)
+    res.status(200).send('OK');
 
-    if (body.object !== 'whatsapp_business_account') {
-      return res.status(200).send('OK');
+    try {
+      const body = req.body;
+
+      if (body.object !== 'whatsapp_business_account') return;
+
+      const entry   = body.entry?.[0];
+      const change  = entry?.changes?.[0]?.value;
+      const message = change?.messages?.[0];
+
+      if (!message) return;
+
+      const phone    = message.from;
+      const type     = message.type;
+      const text     = type === 'text' ? message.text.body : null;
+      const metadata = change?.metadata;
+
+      console.log(`📩 Mensaje de ${phone}: ${text || `[${type}]`}`);
+
+      // Reenviar a n8n con toda la info relevante
+      if (N8N_WEBHOOK_URL) {
+        await fetch(N8N_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            phone,
+            text,
+            type,
+            phone_number_id: metadata?.phone_number_id,
+            timestamp: message.timestamp,
+            raw: body,
+          }),
+        });
+        console.log(`✅ Reenviado a n8n`);
+      } else {
+        console.warn('⚠️ N8N_WEBHOOK_URL no configurado');
+      }
+
+    } catch (err) {
+      console.error('❌ Error procesando mensaje:', err.message);
     }
 
-    const message = body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
-    if (!message || message.type !== 'text') {
-      return res.status(200).send('OK');
-    }
-
-    const from = message.from;         // número del usuario
-    const text = message.text.body;    // texto que mandó
-
-    console.log(`📩 Mensaje de ${from}: ${text}`);
-
-    // Respuesta fija (Paso 1 — sin IA todavía)
-    await sendWhatsApp(from, '🐾 Hola, soy ECO. ¡Estoy despertando!\n\nEste es el primer latido. Pronto podrás criarme. 🥚');
-
-    return res.status(200).send('OK');
+    return;
   }
 
   res.status(405).send('Method Not Allowed');
-}
-
-// ── Envía un mensaje de texto por WhatsApp Cloud API ──────────────────
-async function sendWhatsApp(to, text) {
-  const url = `https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages`;
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      messaging_product: 'whatsapp',
-      to,
-      type: 'text',
-      text: { body: text },
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    console.error('❌ Error enviando mensaje:', JSON.stringify(error));
-  } else {
-    console.log(`✅ Mensaje enviado a ${to}`);
-  }
 }
