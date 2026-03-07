@@ -1,8 +1,34 @@
 // ECO — WhatsApp Webhook
 // Recibe mensajes de Meta y los reenvía a n8n para procesamiento
 
+import https from 'https';
+import { URL }  from 'url';
+
 const VERIFY_TOKEN    = process.env.VERIFY_TOKEN;
 const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL;
+
+// Llama al webhook de n8n ignorando SSL (el cert del servidor venció)
+function postToN8n(url, payload) {
+  return new Promise((resolve, reject) => {
+    const parsed  = new URL(url);
+    const data    = JSON.stringify(payload);
+    const options = {
+      hostname           : parsed.hostname,
+      port               : parsed.port || 443,
+      path               : parsed.pathname,
+      method             : 'POST',
+      headers            : { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) },
+      rejectUnauthorized : false,   // bypass SSL expirado en el servidor n8n
+    };
+    const req = https.request(options, (res) => {
+      res.resume();                 // drena la respuesta (no la necesitamos)
+      resolve(res.statusCode);
+    });
+    req.on('error', reject);
+    req.write(data);
+    req.end();
+  });
+}
 
 export default async function handler(req, res) {
 
@@ -45,19 +71,15 @@ export default async function handler(req, res) {
 
       // Reenviar a n8n ANTES de responder a Meta
       if (N8N_WEBHOOK_URL) {
-        await fetch(N8N_WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            phone,
-            text,
-            type,
-            phone_number_id: metadata?.phone_number_id,
-            timestamp: message.timestamp,
-            raw: body,
-          }),
+        const status = await postToN8n(N8N_WEBHOOK_URL, {
+          phone,
+          text,
+          type,
+          phone_number_id: metadata?.phone_number_id,
+          timestamp: message.timestamp,
+          raw: body,
         });
-        console.log(`✅ Reenviado a n8n`);
+        console.log(`✅ Reenviado a n8n — HTTP ${status}`);
       } else {
         console.warn('⚠️ N8N_WEBHOOK_URL no configurado');
       }
