@@ -90,7 +90,7 @@
     .micro { font-size:.78rem; color:var(--c30); letter-spacing:.04em; }
 
     .hero-right { display:flex; justify-content:center; align-items:center; }
-    .egg-wrap { position:relative; width:clamp(240px,28vw,360px); aspect-ratio:352/434; }
+    .egg-wrap { position:relative; width:clamp(240px,28vw,360px); aspect-ratio:352/434; cursor:pointer; }
     .egg-glow { position:absolute; inset:-50px; background:radial-gradient(ellipse at center,rgba(245,166,35,.2) 0%,transparent 68%); border-radius:50%; animation:pulseGlow 3s ease-in-out infinite; }
     .egg-img { width:100%; height:100%; object-fit:contain; position:relative; z-index:1; animation:floatY 3.5s ease-in-out infinite; filter:drop-shadow(0 0 28px rgba(245,166,35,.5)); }
     .particle { position:absolute; border-radius:50%; background:var(--orange); opacity:0; animation:pFloat 4s ease-in-out infinite; }
@@ -375,7 +375,7 @@
       <div class="hero-right">
         <div class="egg-wrap">
           <div class="egg-glow"></div>
-          <img src="eco-egg-nobg.png" alt="Huevo ECO" class="egg-img" />
+          <img src="eco-egg-nobg.png" alt="Huevo ECO" class="egg-img" id="heroEgg" />
           <div class="particle p1"></div><div class="particle p2"></div>
           <div class="particle p3"></div><div class="particle p4"></div>
         </div>
@@ -749,6 +749,24 @@
     }
   },{threshold:.4});
   obs.observe(document.getElementById('demo'));
+})();
+
+// ── Hero egg tap ─────────────────────────────────────
+(function(){
+  var heroEgg = document.getElementById('heroEgg');
+  var shaking = false;
+  heroEgg.addEventListener('click', function(){
+    if(shaking) return;
+    shaking = true;
+    heroEgg.style.animation = 'none';
+    heroEgg.classList.add('egg-shaking');
+    heroEgg.addEventListener('animationend', function h(){
+      heroEgg.removeEventListener('animationend', h);
+      heroEgg.classList.remove('egg-shaking');
+      heroEgg.style.animation = '';
+      shaking = false;
+    });
+  });
 })();
 
 // ── Egg interaction ─────────────────────────────────
