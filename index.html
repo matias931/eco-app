@@ -297,10 +297,23 @@
     #lore::before { content:''; position:absolute; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E"); pointer-events:none; }
     .lore-grid { display:grid; grid-template-columns:1fr 1px 1fr; gap:64px; align-items:start; position:relative; z-index:1; }
     .lore-sep { background:linear-gradient(to bottom,transparent,var(--c30),transparent); align-self:stretch; }
-    .lore-col { display:flex; flex-direction:column; gap:16px; }
+    .lore-col {
+      display:flex; flex-direction:column; gap:16px;
+      padding:28px 24px; border-radius:14px;
+      border:1px solid rgba(245,166,35,.06);
+      transition:background .4s ease, border-color .4s ease, box-shadow .4s ease;
+      cursor:default;
+    }
+    .lore-col:hover {
+      background:radial-gradient(ellipse at 50% 30%, rgba(245,166,35,.10) 0%, rgba(245,166,35,.02) 55%, transparent 75%);
+      border-color:rgba(245,166,35,.28);
+      box-shadow:0 0 60px rgba(245,166,35,.08) inset, 0 0 20px rgba(245,166,35,.04);
+    }
     .lore-tag { font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--orange); font-weight:500; }
-    .lore-col h3 { font-family:'Playfair Display',serif; font-size:1.5rem; }
-    .lore-col p { font-family:'Playfair Display',serif; font-style:italic; font-size:1.05rem; line-height:1.85; color:var(--c60); }
+    .lore-col h3 { font-family:'Playfair Display',serif; font-size:1.5rem; transition:text-shadow .4s ease, color .4s ease; }
+    .lore-col:hover h3 { text-shadow:0 0 32px rgba(245,166,35,.35); color:var(--cream); }
+    .lore-col p { font-family:'Playfair Display',serif; font-style:italic; font-size:1.05rem; line-height:1.85; color:var(--c60); transition:color .4s ease; }
+    .lore-col:hover p { color:rgba(240,230,208,.85); }
 
     /* ════════════════════════
        8. CTA FINAL
